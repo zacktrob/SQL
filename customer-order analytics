@@ -41,3 +41,10 @@ from customers
 join febsales
 on customers.order_id = febsales.orderID
 where febsales.Quantity > 2; 
+
+--List all the products sold in Los Angeles in February, and include how many of each were sold
+select product, sum(quantity) as total_sold
+from bit_db.febsales
+where location like '%Los Angeles%'
+group by product
+order by total_sold; 
