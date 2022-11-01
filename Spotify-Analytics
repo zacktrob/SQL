@@ -1,0 +1,57 @@
+# For this project, I downloaded a Spotify dataset from Kaggle.
+# I then created a table to insert this Spotify data into.
+# Finally, I performed a few queries to gain insight the data using SQL. 
+
+
+
+CREATE TABLE BIT_DB.Spotifydata (
+    id               INTEGER        PRIMARY KEY,
+    artist_name      VARCHAR        NOT NULL,
+    track_name       VARCHAR        NOT NULL,
+    track_id         VARCHAR        NOT NULL,
+    popularity       INTEGER        NOT NULL,
+    danceability     DECIMAL (4, 3) NOT NULL,
+    energy           DECIMAL (4, 3) NOT NULL,
+    [key]            INTEGER        NOT NULL,
+    loudness         DECIMAL (5, 3) NOT NULL,
+    mode             INTEGER        NOT NULL,
+    speechiness      DECIMAL (5, 4) NOT NULL,
+    acousticness     DECIMAL (6, 5) NOT NULL,
+    instrumentalness TEXT           NOT NULL,
+    liveness         DECIMAL (5, 4) NOT NULL,
+    valence          DECIMAL (4, 3) NOT NULL,
+    tempo            DECIMAL (6, 3) NOT NULL,
+    duration_ms      INTEGER        NOT NULL,
+    time_signature   INTEGER        NOT NULL
+);
+
+--total artists represented
+select count(artist_name) from spotifydata; 
+
+--total unique artists represented?
+select count(distinct artist_name) from spotifydata; 
+
+--average popularity by artist from highest rating to lowest
+select artist_name, avg(popularity)
+from bit_db.Spotifydata
+group by artist_name
+order by avg(popularity) desc;
+
+--average song length per artists from longest to shortest
+select artist_name, avg(duration_ms) as avg_length
+from bit_db.Spotifydata
+group by artist_name
+order by avg_length desc;
+
+--Artists ranked with shortest average song length and highest popularity
+select artist_name, round(avg(popularity), 2) as avg_pop, round(avg(duration_ms),2) as avg_length
+from bit_db.Spotifydata
+group by artist_name
+order by avg_length asc, avg_pop desc; 
+
+
+--relationship between acousticness/instrumentalness and popularity? 
+select artist_name, avg(acousticness), avg(instrumentalness), avg(popularity)
+from bit_db.spotifydata
+group by artist_name
+order by popularity desc; 
