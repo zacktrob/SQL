@@ -1,0 +1,82 @@
+#In this project I queried data from a dataset given in the final SQL project in the BreakIntoTech Data Analytics course. 
+
+
+--Show Customers (their full names, customer ID, and country) who are not in the US. 
+
+select firstname, lastname, customerid, country
+from chinook.customers
+where country != 'USA'; 
+
+--Show only the Customers from Brazil
+
+select firstname, lastname, customerid, country
+from chinook.customers
+where country = 'Brazil'; 
+
+--Find the Invoices of customers who are from Brazil. 
+--The resulting table should show the customer's full name, 
+--Invoice ID, Date of the invoice, and billing country
+
+select a.firstname, a.lastname, b.invoiceid, b.invoicedate, b.billingcountry 
+from chinook.customers a
+join chinook.invoices b
+on a.customerId = b.customerId
+where a.country = 'Brazil';
+
+--Show the Employees who are Sales Agents
+
+select firstname, lastname, title
+ from chinook.employees
+ where title like '%sales % agent%';
+ 
+--Find a unique/distinct list of billing countries from the Invoice table
+
+select distinct billingcountry 
+from chinook.invoices
+order by billingcountry; 
+
+--Provide a query that shows the invoices associated with each sales agent. 
+--The resulting table should include the Sales Agent's full name
+
+select emp.firstname, emp.lastname, i.invoiceid
+from chinook.employees emp
+join chinook.customers cust
+on cust.supportrepid = emp.employeeid
+join chinook.invoices i
+on i.customerid = cust.customerid; 
+
+--Show the Invoice Total, Customer name, Country, and 
+--Sales Agent name for all invoices and customers.
+
+select i.total, c.firstname, c.lastname, c.country, s.firstname as repfirst, s.lastname as replast
+from chinook.invoices i
+join chinook.customers c
+on i.customerId = c.customerId
+join chinook.employees s
+on s.employeeId = c.supportrepid; 
+
+--How many Invoices were there in 2009
+
+select count(invoiceid)
+from chinook.invoices; 
+--412
+
+select count(distinct invoiceid)
+from chinook.invoices; 
+--412
+
+--what are the total sales for 2009
+
+select sum(total) as total_sales
+ from chinook.invoices
+ where invoicedate between '2009-01-01' and '2009-12-31'; 
+ 
+--which sales agent made the most dollars in sales in 2009
+
+select sum(i.total) as sales, e.firstname, e.lastname
+from chinook.invoices i
+join chinook.customers c
+on i.customerid = c.customerid
+join chinook.employees e
+on c.supportrepid = e.employeeid
+group by e.employeeid;
