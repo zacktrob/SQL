@@ -1,0 +1,52 @@
+#This project looks at data from the English Premier League from the 1993-2022 seasons. The data source was taken from Kaggle. 
+#I used the below SQL to filter and extract the data to Tableau where you can see the visualizations of the results and goals from the league during that time frame 
+#at the below links: 
+#https://public.tableau.com/app/profile/zack.trobaugh/viz/PremierLeagueResults1993-2022/Dashboard1
+3https://public.tableau.com/app/profile/zack.trobaugh/viz/PremierLeagueGoals1993-2022/Dashboard1
+
+
+--find how many total goals, home goals, and away goals were scored by club
+select distinct home as club,sum(homegoals + awaygoals) as Goals_scored,sum(homegoals) as home_goals, sum(awaygoals) as away_goals  
+from eplmatches 
+group by club  
+order by  Goals_scored desc; 
+
+--find how many home and away games each club played during this time
+select count(home) as home_games, count(away) as away_games, home as club  
+from eplmatches  
+group by club  
+order by home_games desc; 
+
+--find how many wins each club had at home
+select count(ftr) as home_wins, home as club 
+from eplmatches 
+where ftr = 'H'  
+group by club 
+order by home_wins desc; 
+
+--find how many wins each club had away
+select count(ftr) as away_wins, away as club 
+from eplmatches 
+where ftr = 'A'  
+group by club 
+order by away_wins desc; 
+
+--find out how man times each club tied a game
+select count(ftr) as draws, home as club 
+from eplmatches 
+where ftr = 'D' 
+group by club 
+order by draws desc; 
+
+--find how many games each team played at home and away
+select count(home) as home_games, count(away) as away_games, home as club  
+from eplmatches  
+group by club  
+order by home_games desc;
+
+
+
+
+
+
+
