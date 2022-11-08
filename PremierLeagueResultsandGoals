@@ -1,8 +1,8 @@
 #This project looks at data from the English Premier League from the 1993-2022 seasons. The data source was taken from Kaggle. 
-#I used the below SQL to filter and extract the data to Tableau where you can see the visualizations of the results and goals from the league during that time frame 
-#at the below links: 
+#I used the below SQL to filter and extract the data to Tableau where you can see the visualizations of the results and goals from the league during 
+#that time frame at the below links: 
 #https://public.tableau.com/app/profile/zack.trobaugh/viz/PremierLeagueResults1993-2022/Dashboard1
-3https://public.tableau.com/app/profile/zack.trobaugh/viz/PremierLeagueGoals1993-2022/Dashboard1
+#https://public.tableau.com/app/profile/zack.trobaugh/viz/PremierLeagueGoals1993-2022/Dashboard1
 
 
 --find how many total goals, home goals, and away goals were scored by club
