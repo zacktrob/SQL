@@ -1,0 +1,60 @@
+#This project looks at data from the current year for the biggest youth soccer club in the south. The data was extracted, 
+#transformed, and loaded into Tableau for visualization. 
+#I used the below SQL to filter to Tableau where you can see the visualizations of the results. 
+#https://public.tableau.com/app/profile/zack.trobaugh/viz/SoccerClubPlayers2223/Dashboard1
+
+--update table to reflect a location column
+alter table tsc.players
+add location text; 
+
+--set location column equal to Williamson when Williamson in team name
+set sql_safe_updates=0;
+update tsc.players
+set location = 'Williamson'
+where team like '%Williamson%'; 
+set sql_safe_updates=1; 
+
+--set location column equal to Murfreesboro when Murfreesboro in team name
+set sql_safe_updates=0;
+update tsc.players
+set location = 'Murfreesboro'
+where team like '%Murfreesboro%'; 
+set sql_safe_updates=1; 
+
+--set location column equal to Sumner when Sumner in team name
+set sql_safe_updates=0;
+update tsc.players
+set location = 'Sumner'
+where team like '%Sumner%'; 
+set sql_safe_updates=1; 
+
+--set location column equal to Nashville when Nashville in team name
+set sql_safe_updates=0;
+update tsc.players
+set location = 'Nashville'
+where team like '%Nashville%'; 
+set sql_safe_updates=1; 
+
+--checking to make sure there are no teams remaining without a location
+select team from tsc.players
+where location is null;  
+
+--teams remained without a location due to being higher level, so updated the location to Williamson because that is where these teams reside.
+set sql_safe_updates=0;
+update tsc.players
+set location = 'Williamson'
+where location is null; 
+set sql_safe_updates=1;
+
+--Filter data needed for Tableau dashboard analytics. 
+select 
+	id, 
+    team, 
+    gender, 
+    year(birth_date) as birth_year, 
+    city, 
+    state, 
+    zip, 
+    location 
+from tsc.players
+limit 2000; 
