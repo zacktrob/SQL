@@ -1,0 +1,85 @@
+#The below SQL project was completed using Maven Analytics Advanced SQL course where I analyzed traffic sources
+#from Maven's E-Commerce database. 
+
+USE mavenfactory; 
+
+-- Analyzing of top traffic sources - breakdown of utm source, campaign, and referring domain
+SELECT 
+	utm_source, 
+	utm_campaign, 
+	http_referer, 
+    COUNT(DISTINCT website_session_id) AS num_session
+FROM website_sessions
+WHERE created_at < '2012-04-12'
+GROUP BY 
+	utm_source, 
+    utm_campaign,
+    http_referer
+ORDER BY num_session DESC; 
+
+-- Analyzing traffic source conversion rates - Calculate the conversion rate from web session to order for gsearch nonbrand traffic 
+SELECT 
+    COUNT(DISTINCT website_sessions.website_session_id) AS sessions,
+    COUNT(DISTINCT orders.order_id) AS orders,
+    (COUNT(DISTINCT orders.order_id) / COUNT(DISTINCT website_sessions.website_session_id) * 100) AS session_to_order_conv_rate
+FROM
+    website_sessions
+        LEFT JOIN
+    orders ON website_sessions.website_session_id = orders.website_session_id
+WHERE
+    website_sessions.created_at < '2012-04-14'
+        AND utm_source = 'gsearch'
+        AND utm_campaign = 'nonbrand'; 
+        
+-- Analyze traffic source trending - pull gsearch nonbrand trended session volume by week
+SELECT 
+    YEAR(created_at),
+    WEEK(created_at),
+    MIN(DATE(created_at)) AS week_start,
+    COUNT(DISTINCT website_session_id) AS sessions
+FROM
+    website_sessions
+WHERE
+    website_sessions.created_at < '2012-05-10'
+        AND utm_source = 'gsearch'
+        AND utm_campaign = 'nonbrand'
+GROUP BY 1 , 2; 
+
+-- Optimizing bids for paid traffic - pull conversion rates from session to order by device type
+SELECT 
+    ws.device_type,
+    COUNT(DISTINCT ws.website_session_id) AS sessions,
+    COUNT(DISTINCT o.order_id) AS orders,
+    (COUNT(DISTINCT o.order_id) / COUNT(DISTINCT ws.website_session_id) * 100) AS session_to_order_conv_rate
+FROM
+    website_sessions AS ws
+        LEFT JOIN
+    orders AS o ON ws.website_session_id = o.website_session_id
+WHERE
+    ws.created_at < '2012-05-11'
+        AND utm_source = 'gsearch'
+        AND utm_campaign = 'nonbrand'
+GROUP BY ws.device_type
+ORDER BY orders; 
+
+-- pull weekly trends for desktop and mobile to see the impact of bidding up, use dates from mid april - june 9. 
+SELECT 
+    YEAR(created_at) AS yr,
+    WEEK(created_at) AS wk,
+    MIN(DATE(created_at)) AS week_start,
+    COUNT(DISTINCT CASE
+            WHEN device_type = 'desktop' THEN website_session_id
+            ELSE NULL
+        END) AS desktop_sessions,
+    COUNT(DISTINCT CASE
+            WHEN device_type = 'mobile' THEN website_session_id
+            ELSE NULL
+        END) AS mobile_sessions,
+    COUNT(DISTINCT website_session_id) AS total_sessions
+FROM
+    website_sessions AS ws
+WHERE
+    ws.created_at BETWEEN '2012-04-15' AND '2012-06-09'
+        AND utm_source = 'gsearch'
+        AND utm_campaign = 'nonbrand'
+GROUP BY 1 , 2; 
