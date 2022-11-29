@@ -5,48 +5,63 @@
 #https://public.tableau.com/app/profile/zack.trobaugh/viz/PremierLeagueGoals1993-2022/Dashboard1
 
 
---find how many total goals, home goals, and away goals were scored by club
-select distinct home as club,sum(homegoals + awaygoals) as Goals_scored,sum(homegoals) as home_goals, sum(awaygoals) as away_goals  
-from eplmatches 
-group by club  
-order by  Goals_scored desc; 
+-- find how many total goals, home goals, and away goals were scored by club
+SELECT DISTINCT
+    home AS club,
+    SUM(homegoals + awaygoals) AS Goals_scored,
+    SUM(homegoals) AS home_goals,
+    SUM(awaygoals) AS away_goals
+FROM
+    eplmatches
+GROUP BY club
+ORDER BY Goals_scored DESC;
 
---find how many home and away games each club played during this time
-select count(home) as home_games, count(away) as away_games, home as club  
-from eplmatches  
-group by club  
-order by home_games desc; 
+-- find how many home and away games each club played during this time
+SELECT 
+    COUNT(home) AS home_games,
+    COUNT(away) AS away_games,
+    home AS club
+FROM
+    eplmatches
+GROUP BY club
+ORDER BY home_games DESC;
 
---find how many wins each club had at home
-select count(ftr) as home_wins, home as club 
-from eplmatches 
-where ftr = 'H'  
-group by club 
-order by home_wins desc; 
+-- find how many wins each club had at home
+SELECT 
+    COUNT(ftr) AS home_wins, home AS club
+FROM
+    eplmatches
+WHERE
+    ftr = 'H'
+GROUP BY club
+ORDER BY home_wins DESC;
 
---find how many wins each club had away
-select count(ftr) as away_wins, away as club 
-from eplmatches 
-where ftr = 'A'  
-group by club 
-order by away_wins desc; 
+-- find how many wins each club had away
+SELECT 
+    COUNT(ftr) AS away_wins, away AS club
+FROM
+    eplmatches
+WHERE
+    ftr = 'A'
+GROUP BY club
+ORDER BY away_wins DESC;
 
---find out how man times each club tied a game
-select count(ftr) as draws, home as club 
-from eplmatches 
-where ftr = 'D' 
-group by club 
-order by draws desc; 
+-- find out how man times each club tied a game
+SELECT 
+    COUNT(ftr) AS draws, home AS club
+FROM
+    eplmatches
+WHERE
+    ftr = 'D'
+GROUP BY club
+ORDER BY draws DESC;
 
---find how many games each team played at home and away
-select count(home) as home_games, count(away) as away_games, home as club  
-from eplmatches  
-group by club  
-order by home_games desc;
-
-
-
-
-
-
-
+-- find how many games each team played at home and away
+SELECT 
+    COUNT(home) AS home_games,
+    COUNT(away) AS away_games,
+    home AS club
+FROM
+    eplmatches
+GROUP BY club
+ORDER BY home_games DESC;
