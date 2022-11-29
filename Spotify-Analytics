@@ -25,33 +25,52 @@ CREATE TABLE BIT_DB.Spotifydata (
     time_signature   INTEGER        NOT NULL
 );
 
---total artists represented
-select count(artist_name) from spotifydata; 
+-- total artists represented
+SELECT 
+    COUNT(artist_name)
+FROM
+    spotifydata;
 
---total unique artists represented?
-select count(distinct artist_name) from spotifydata; 
+-- total unique artists represented?
+SELECT 
+    COUNT(DISTINCT artist_name)
+FROM
+    spotifydata;
 
---average popularity by artist from highest rating to lowest
-select artist_name, avg(popularity)
-from bit_db.Spotifydata
-group by artist_name
-order by avg(popularity) desc;
+-- average popularity by artist from highest rating to lowest
+SELECT 
+    artist_name, AVG(popularity)
+FROM
+    bit_db.Spotifydata
+GROUP BY artist_name
+ORDER BY AVG(popularity) DESC;
 
---average song length per artists from longest to shortest
-select artist_name, avg(duration_ms) as avg_length
-from bit_db.Spotifydata
-group by artist_name
-order by avg_length desc;
+-- average song length per artists from longest to shortest
+SELECT 
+    artist_name, AVG(duration_ms) AS avg_length
+FROM
+    bit_db.Spotifydata
+GROUP BY artist_name
+ORDER BY avg_length DESC;
 
---Artists ranked with shortest average song length and highest popularity
-select artist_name, round(avg(popularity), 2) as avg_pop, round(avg(duration_ms),2) as avg_length
-from bit_db.Spotifydata
-group by artist_name
-order by avg_length asc, avg_pop desc; 
+-- Artists ranked with shortest average song length and highest popularity
+SELECT 
+    artist_name,
+    ROUND(AVG(popularity), 2) AS avg_pop,
+    ROUND(AVG(duration_ms), 2) AS avg_length
+FROM
+    bit_db.Spotifydata
+GROUP BY artist_name
+ORDER BY avg_length ASC , avg_pop DESC;
 
 
---relationship between acousticness/instrumentalness and popularity? 
-select artist_name, avg(acousticness), avg(instrumentalness), avg(popularity)
-from bit_db.spotifydata
-group by artist_name
-order by popularity desc; 
+-- relationship between acousticness/instrumentalness and popularity? 
+SELECT 
+    artist_name,
+    AVG(acousticness),
+    AVG(instrumentalness),
+    AVG(popularity)
+FROM
+    bit_db.spotifydata
+GROUP BY artist_name
+ORDER BY popularity DESC; 
