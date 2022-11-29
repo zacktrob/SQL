@@ -1,0 +1,415 @@
+#The following slq code represents solutions to problems/questions in the udemy course: 
+#15Days of SQL: The complete SQL masterclass. The below is for days 1-5. 
+
+use days15;
+-- day 1
+SELECT 
+    *
+FROM
+    customer;
+
+SELECT 
+    first_name, last_name, email
+FROM
+    customer
+ORDER BY last_name DESC , first_name DESC;
+
+SELECT 
+    *
+FROM
+    payment;
+
+SELECT DISTINCT
+    amount
+FROM
+    payment
+ORDER BY amount DESC;
+
+SELECT DISTINCT
+    district
+FROM
+    address
+ORDER BY district ASC;
+
+SELECT 
+    rental_date
+FROM
+    rental
+ORDER BY rental_date DESC
+LIMIT 1;
+
+SELECT 
+    COUNT(DISTINCT film_id)
+FROM
+    film;
+
+SELECT 
+    COUNT(DISTINCT last_name)
+FROM
+    customer;
+
+-- end day 1
+
+SELECT 
+    COUNT(payment_id)
+FROM
+    payment
+WHERE
+    customer_id = 100;
+
+SELECT 
+    last_name
+FROM
+    customer
+WHERE
+    first_name = 'Erica';
+
+SELECT 
+    COUNT(rental_id)
+FROM
+    rental
+WHERE
+    return_date IS NULL;
+
+SELECT 
+    payment_id, amount
+FROM
+    payment
+WHERE
+    amount < 2
+ORDER BY amount DESC;
+
+SELECT 
+    *
+FROM
+    payment
+WHERE
+    customer_id IN (322 , 346, 354)
+        AND (amount < 2 OR amount > 10)
+ORDER BY customer_id ASC , amount DESC;
+
+SELECT 
+    COUNT(*) AS faulty
+FROM
+    payment
+WHERE
+    amount BETWEEN 1.99 AND 3.99
+        AND payment_date BETWEEN '2020-01-26' AND '2020-01-27 23:59';
+
+SELECT 
+    *
+FROM
+    payment
+WHERE
+    customer_id IN (12 , 25, 67, 93, 124, 234)
+        AND amount IN (4.99 , 7.99, 9.99)
+        AND payment_date BETWEEN '2020-01-01' AND '2020-01-31 23:59';
+    
+
+SELECT 
+    COUNT(*)
+FROM
+    film
+WHERE
+    description LIKE '%Documentary%';
+
+SELECT 
+    COUNT(*)
+FROM
+    customer
+WHERE
+    first_name LIKE '___'
+        AND (last_name LIKE '%x'
+        OR last_name LIKE '%y');
+
+SELECT 
+    COUNT(*) AS no_of_movies
+FROM
+    film
+WHERE
+    description LIKE '%Saga%'
+        AND (title LIKE 'A%' OR title LIKE '%r');
+    
+SELECT 
+    *
+FROM
+    customer
+WHERE
+    first_name LIKE '_a%er%'
+ORDER BY last_name DESC;
+
+SELECT 
+    COUNT(*)
+FROM
+    payment
+WHERE
+    (amount = 0
+        OR amount BETWEEN 3.99 AND 7.99)
+        AND payment_date BETWEEN '2020-05-01' AND '2020-05-02';
+-- end day 2
+
+SELECT 
+    MIN(replacement_cost) AS least,
+    MAX(replacement_cost) AS most,
+    ROUND(AVG(replacement_cost), 2) AS average,
+    ROUND(SUM(replacement_cost), 2) AS total
+FROM
+    film;
+    
+SELECT 
+    staff_id,
+    COUNT(DISTINCT payment_id) AS num_payments,
+    ROUND(SUM(amount), 2) AS total_sold,
+    MAX(amount) AS highest_order
+FROM
+    payment
+GROUP BY staff_id;
+    
+SELECT 
+    staff_id,
+    DATE(payment_date) AS date_sold,
+    ROUND(SUM(amount), 2) AS highest,
+    COUNT(DISTINCT payment_id) AS num_sales
+FROM
+    payment
+WHERE
+    amount <> 0
+GROUP BY staff_id , date_sold
+HAVING num_sales > 350
+ORDER BY highest DESC;
+
+
+SELECT 
+    customer_id,
+    DATE(payment_date) AS date,
+    ROUND(AVG(amount), 2) AS avg_spent,
+    SUM(amount) AS total_spent,
+    COUNT(payment_id)
+FROM
+    payment
+WHERE
+    DATE(payment_date) BETWEEN '2020-04-28' AND '2020-04-30'
+GROUP BY date , customer_id
+HAVING COUNT(payment_id) > 1
+ORDER BY avg_spent DESC;
+
+-- end day 3
+
+-- day 4
+SELECT 
+    LOWER(first_name),
+    LOWER(last_name),
+    LENGTH(first_name),
+    LENGTH(last_name),
+    LOWER(email)
+FROM
+    customer
+WHERE
+    LENGTH(first_name) > 10
+        OR LENGTH(last_name) > 10; 
+
+select 
+	right(email, 5),
+    email
+from customer; 
+
+select 
+	left(right(email, 4),1), 
+    email
+from customer; 
+	
+select 
+	email, 
+	concat(left(email,1), '***', right(email, 19)) as anonyized
+from customer; 
+
+select 
+	position('@' in email), 
+    email
+from customer; 
+
+select 
+	concat(last_name, ',', left(email, position(last_name in email) - 2)) as lastName_firstName
+from customer; 
+
+select
+	substring(email, 1, 5)
+from customer; 
+
+SELECT 
+    CONCAT(LEFT(first_name, 1),
+            '***',
+            LEFT(last_name, 1),
+            '***',
+            SUBSTRING(email,
+                POSITION('@' IN email),
+                19)) AS anonymized1
+FROM
+    customer; 
+
+SELECT 
+    CONCAT('***',
+			right(first_name, 1),
+            '.',
+            LEFT(last_name, 1),
+            '***',
+            SUBSTRING(email,
+                POSITION('@' IN email),
+                19)) AS anonymized2
+FROM
+    customer; 
+    
+SELECT 
+    EXTRACT(MONTH FROM rental_date) AS month,
+    COUNT(rental_id) AS total_sales
+FROM
+    rental
+GROUP BY month
+ORDER BY total_sales DESC;
+
+SELECT 
+    EXTRACT(MONTH FROM payment_date) AS pay_month,
+    ROUND(SUM(amount), 2) AS total_payments
+FROM
+    payment
+GROUP BY pay_month
+ORDER BY total_payments DESC;
+
+SELECT 
+    DAYOFWEEK(payment_date) AS week_day,
+    ROUND(SUM(amount), 2) AS total_revenue
+FROM
+    payment
+GROUP BY week_day
+ORDER BY total_revenue DESC;
+
+SELECT 
+    WEEK(payment_date) AS week_of_year,
+    ROUND(SUM(amount), 2) AS total_spent,
+    customer_id
+FROM
+    payment
+GROUP BY week_of_year , customer_id
+ORDER BY total_spent DESC;
+    
+SELECT 
+    DATEDIFF(return_date, rental_date) AS duration, rental_id
+FROM
+    rental
+WHERE
+    customer_id = 35
+ORDER BY duration DESC;
+
+SELECT 
+    AVG(DATEDIFF(return_date, rental_date)) AS avg_duration,
+    customer_id
+FROM
+    rental
+GROUP BY customer_id
+ORDER BY avg_duration DESC;
+
+-- end day 4
+
+SELECT 
+    film_id,
+    ROUND(rental_rate / replacement_cost * 100, 2) AS percentage
+FROM
+    film
+WHERE
+    rental_rate / replacement_cost * 100 < 4
+ORDER BY percentage;
+
+-- using different database for flight information
+SELECT 
+    COUNT(ticket_no) AS num_tickets,
+    CASE
+        WHEN amount < 20000 THEN 'Low price ticket'
+        WHEN amount BETWEEN 20000 AND 150000 THEN 'Mid price ticket'
+        ELSE 'High price ticket'
+    END AS ticket_range
+FROM
+    ticket_flights
+GROUP BY ticket_range
+ORDER BY num_tickets DESC;
+
+
+SELECT 
+    COUNT(*) AS flights,
+    CASE
+        WHEN MONTH(actual_departure) IN (12 , 01, 02) THEN 'Winter'
+        WHEN MONTH(actual_departure) IN (03 , 04, 05) THEN 'Spring'
+        WHEN MONTH(actual_departure) IN (06 , 07, 08) THEN 'Summer'
+        ELSE 'Fall'
+    END AS season
+FROM
+    flights
+GROUP BY season
+ORDER BY flights; 
+
+
+-- back to movie database
+SELECT 
+    title,
+    CASE
+        WHEN
+            (rating = 'PG' OR rating = 'PG-13')
+                OR length > 210
+        THEN
+            'Great rating or long (tier 1'
+        WHEN
+            description LIKE '%drama%'
+                AND length > 90
+        THEN
+            'Long drama (tier 2)'
+        WHEN
+            description LIKE '%drama%'
+                AND length <= 90
+        THEN
+            'Short drama (tier 3)'
+        WHEN rental_rate < 1 THEN 'Very cheap (tier 4)'
+    END AS tier_level
+FROM
+    film
+HAVING tier_level IS NOT NULL; 
+
+
+SELECT 
+    SUM(CASE
+        WHEN rating = 'G' THEN 1
+        ELSE 0
+    END) AS 'G',
+    SUM(CASE
+        WHEN rating = 'PG' THEN 1
+        ELSE 0
+    END) AS 'PG',
+    SUM(CASE
+        WHEN rating = 'PG-13' THEN 1
+        ELSE 0
+    END) AS 'PG-13',
+    SUM(CASE
+        WHEN rating = 'R' THEN 1
+        ELSE 0
+    END) AS 'R',
+    SUM(CASE
+        WHEN rating = 'NC-17' THEN 1
+        ELSE 0
+    END) AS 'NC-17'
+FROM
+    film; 
+    
+SELECT 
+    rental_date,
+    return_date,
+    COALESCE(CAST(return_date AS CHAR),
+            'Not returned')
+FROM
+    rental
+ORDER BY rental_date DESC; 
+
+-- back to flight database
+SELECT 
+    CAST(REPLACE(flight_no, 'PG', '') AS UNSIGNED) AS int_flight_number
+FROM
+    flights; 
+    
+-- end day 5
