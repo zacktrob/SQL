@@ -1,0 +1,132 @@
+#The following slq code represents solutions to problems/questions in the udemy course: 
+#15Days of SQL: The complete SQL masterclass. The below is for days 6-10. 
+
+-- day 6
+
+SELECT 
+    COUNT(DISTINCT bp.ticket_no) AS seats_chosen,
+    s.fare_conditions AS category
+FROM
+    seats AS s
+        JOIN
+    boarding_passes AS bp ON s.seat_no = bp.seat_no
+GROUP BY category
+ORDER BY seats_chosen DESC;
+
+SELECT 
+    COUNT(DISTINCT bp.ticket_no) AS seats_chosen,
+    s.fare_conditions AS category
+FROM
+    seats AS s
+        JOIN
+    boarding_passes AS bp ON s.seat_no = bp.seat_no
+GROUP BY category
+ORDER BY seats_chosen DESC;
+
+SELECT 
+    t.ticket_no, bp.ticket_no
+FROM
+    tickets t
+        JOIN
+    boarding_passes bp ON t.ticket_no = bp.ticket_no
+WHERE
+    bp.ticket_no IS NULL;
+
+SELECT 
+    *
+FROM
+    aircrafts_data a
+        JOIN
+    flights f ON a.aircraft_code = f.aircraft_code;
+
+SELECT 
+    RIGHT(s.seat_no, 1) AS row, COUNT(s.seat_no)
+FROM
+    boarding_passes bp
+        JOIN
+    seats s ON bp.seat_no = s.seat_no
+GROUP BY row
+ORDER BY COUNT(s.seat_no) DESC;
+ 
+SELECT 
+    *
+FROM
+    seats s
+        LEFT JOIN
+    boarding_passes bp ON bp.seat_no = s.seat_no
+WHERE
+    bp.seat_no IS NULL;
+-- group by s.seat_no
+-- order by count(s.seat_no) desc; 
+
+SELECT 
+    c.first_name, c.last_name, a.phone, a.district
+FROM
+    address a
+        LEFT JOIN
+    customer c ON a.address_id = c.address_id
+WHERE
+    a.district = 'Texas';
+
+SELECT 
+    a.address_id, a.address, c.customer_id
+FROM
+    address a
+        LEFT JOIN
+    customer c ON a.address_id = c.address_id
+WHERE
+    c.customer_id IS NULL;
+
+SELECT 
+    u.first_name, u.last_name, u.email, c.country
+FROM
+    customer u
+        LEFT JOIN
+    address a ON u.address_id = a.address_id
+        LEFT JOIN
+    city ON a.city_id = city.city_id
+        LEFT JOIN
+    country c ON city.country_id = c.country_id
+WHERE
+    country = 'Brazil';
+    
+SELECT 
+    t.passenger_name, SUM(b.total_amount) AS most_money_spent
+FROM
+    tickets t
+        LEFT JOIN
+    bookings b ON t.book_ref = b.book_ref
+GROUP BY 1
+ORDER BY 2 DESC
+LIMIT 1;
+
+SELECT 
+    tf.fare_conditions, COUNT(tf.fare_conditions) AS how_many
+FROM
+    ticket_flights tf
+        LEFT JOIN
+    tickets t ON tf.ticket_no = t.ticket_no
+WHERE
+    t.passenger_name = 'ALEKSANDR IVANOV'
+GROUP BY tf.fare_conditions;
+
+
+SELECT 
+    c.first_name,
+    c.last_name,
+    f.title,
+    COUNT(DISTINCT r.rental_id) AS how_many
+FROM
+    customer c
+        LEFT JOIN
+    rental r ON c.customer_id = r.customer_id
+        LEFT JOIN
+    inventory i ON i.inventory_id = r.inventory_id
+        LEFT JOIN
+    film f ON f.film_id = i.film_id
+WHERE
+    c.first_name = 'George'
+        AND c.last_name = 'Linton'
+GROUP BY f.title
+ORDER BY how_many DESC; 
+ 
