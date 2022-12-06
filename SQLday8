@@ -1,0 +1,236 @@
+#The following slq code represents solutions to problems/questions in the udemy course: 
+#15Days of SQL: The complete SQL masterclass. The below is for day 8.  
+
+-- day 8
+
+-- 1. Create a list of all the different (distinct) replacement costs of the films
+
+SELECT DISTINCT
+    replacement_cost
+FROM
+    film
+GROUP BY replacement_cost
+ORDER BY replacement_cost; -- correct
+
+-- 2. Write a query that gives an overview of how many films have replacements costs in the following cost ranges
+-- low: 9.99 - 19.99 | medium: 20.00 - 24.99 | high: 25.00 - 29.99
+-- Question: How many films have a replacement cost in the "low" group?
+
+SELECT 
+    COUNT(replacement_cost),
+    CASE
+        WHEN replacement_cost BETWEEN 9.99 AND 19.99 THEN 'Low'
+        WHEN replacement_cost BETWEEN 20.00 AND 24.99 THEN 'Medium'
+        WHEN replacement_cost BETWEEN 25.00 AND 29.99 THEN 'High'
+    END AS replacement_category
+FROM
+    film
+GROUP BY replacement_category
+ORDER BY COUNT(replacement_cost); -- correct
+
+-- 3. Create a list of the film titles including their title, 
+-- length and category name ordered descendingly by the length. 
+-- Filter the results to only the movies in the category 'Drama' or 'Sports'.
+-- Question: In which category is the longest film and how long is it?
+
+SELECT 
+    f.title, f.length, c.name
+FROM
+    film f
+        LEFT JOIN
+    film_category fc ON f.film_id = fc.film_id
+        LEFT JOIN
+    category c ON fc.category_id = c.category_id
+WHERE
+    c.name IN ('Drama' , 'Sports')
+ORDER BY length DESC; -- correct
+
+-- 4. Create an overview of how many movies (titles) there are in each category (name).
+-- Question: Which category (name) is the most common among the films?
+
+SELECT 
+    COUNT(f.title) AS movies, c.name
+FROM
+    film f
+        LEFT JOIN
+    film_category fc ON f.film_id = fc.film_id
+        LEFT JOIN
+    category c ON fc.category_id = c.category_id
+GROUP BY c.name
+ORDER BY movies DESC; -- correct
+
+-- 5. Create an overview of the actors first and last names and in  how many movies they appear.
+-- Question: Which actor is part of most movies??
+
+SELECT 
+    a.first_name, a.last_name, COUNT(fa.film_id) AS num_movies
+FROM
+    actor a
+        LEFT JOIN
+    film_actor fa ON a.actor_id = fa.actor_id
+GROUP BY 2 , 1
+ORDER BY num_movies DESC; -- correct 
+
+
+-- 6.Create an overview of the addresses that are not associated to any customer.
+-- Question: How many addresses are that?
+
+SELECT 
+    a.address_id, c.address_id, a.address
+FROM
+    address a
+        LEFT JOIN
+    customer c ON a.address_id = c.address_id
+WHERE
+    c.address_id IS NULL; -- correct
+    
+-- 7. Create an overview of the cities and how much sales (sum of amount) have occured there.
+-- Question: Which city has the most sales?
+
+SELECT 
+    c.city, ROUND(SUM(p.amount), 2) AS city_sales
+FROM
+    payment p
+        LEFT JOIN
+    customer cu ON p.customer_id = cu.customer_id
+        LEFT JOIN
+    address a ON cu.address_id = a.address_id
+        LEFT JOIN
+    city c ON a.city_id = c.city_id
+GROUP BY c.city
+ORDER BY city_sales DESC; -- correct
+
+-- 8. Create an overview of the revenue (sum of amount) 
+-- grouped by a column in the format "country, city".
+-- Question: Which country, city has the least sales?
+
+SELECT 
+    SUM(p.amount) AS revenue,
+    CONCAT(c.country, ', ', ci.city) AS location
+FROM
+    payment p
+        LEFT JOIN
+    customer cu ON p.customer_id = cu.customer_id
+        LEFT JOIN
+    address a ON cu.address_id = a.address_id
+        LEFT JOIN
+    city ci ON a.city_id = ci.city_id
+        LEFT JOIN
+    country c ON ci.country_id = c.country_id
+GROUP BY location
+ORDER BY revenue ASC; -- correct
+
+-- 9. Create a list with the average of the sales amount each staff_id has per customer.
+-- Question: Which staff_id makes in average more revenue per customer?
+
+    
+select 
+	sub.staff_id, 
+    round((sub.total/sub.num_cust), 2) as per_cust
+from 
+(select 
+	staff_id,
+	count(distinct customer_id) as num_cust, 
+    sum(amount) as total
+from payment
+group by staff_id) as sub
+group by sub.staff_id; -- correct using subquery
+
+
+select 
+	staff_id, 
+    round(sum(amount)/count(distinct customer_id), 2) as av
+from payment
+group by staff_id; -- second solution without using a subquery
+
+-- 10. Create a query that shows average daily revenue of all Sundays.
+-- Question: What is the daily average revenue of all Sundays?
+
+
+select 
+	sum(amount)/(count(distinct date(payment_date))) as av
+from payment
+where payment_date in 
+(select 
+	payment_date
+from payment
+where dayofweek(payment_date) = 7); -- correct
+
+
+-- 11. Create a list of movies - with their length and their replacement cost - 
+-- that are longer than the average length in each replacement cost group.
+-- Question: Which two movies are the shortest in that list and how long are they?
+
+SELECT 
+    f.title, f.length, f.replacement_cost
+FROM
+    film f
+WHERE
+    f.length > (SELECT 
+            AVG(length)
+        FROM
+            film f2
+        WHERE
+            f.replacement_cost = f2.replacement_cost)
+ORDER BY length ASC; -- correct
+
+-- 12. Create a list that shows how much the average customer spent in total
+-- (customer life-time value) grouped by the different districts.
+-- Question: Which district has the highest average customer life-time value?
+
+SELECT 
+    ROUND(SUM(p.amount) / COUNT(DISTINCT p.customer_id),
+            2) AS av,
+    a.district
+FROM
+    payment p
+        LEFT JOIN
+    customer cu ON p.customer_id = cu.customer_id
+        LEFT JOIN
+    address a ON cu.address_id = a.address_id
+WHERE
+    a.district IN (SELECT DISTINCT
+            district
+        FROM
+            address)
+GROUP BY a.district
+ORDER BY av DESC; -- correct
+
+-- 13. Create a list that shows all 
+-- payments including the payment_id, amount and the film category 
+-- (name) plus the total amount that was made in this category. 
+-- Order the results ascendingly by the category (name) and as second order 
+-- criterion by the payment_id ascendingly.
+
+-- Question: What is the total revenue of the category 'Action' and what 
+-- is the lowest payment_id in that category 'Action'?
+
+-- payment, rental, inventory, film_category,  category
+SELECT 
+    p.payment_id,
+    p.amount,
+    c.name,
+    (SELECT 
+            SUM(amount)
+        FROM
+            payment p
+                LEFT JOIN
+            rental r ON p.rental_id = r.rental_id
+                LEFT JOIN
+            inventory i ON r.inventory_id = i.inventory_id
+                LEFT JOIN
+            film_category fc ON i.film_id = fc.film_id
+                LEFT JOIN
+            category c1 ON fc.category_id = c1.category_id
+        WHERE
+            c1.name = c.name)
+FROM
+    payment p
+        LEFT JOIN
+    rental r ON p.rental_id = r.rental_id
+        LEFT JOIN
+    inventory i ON r.inventory_id = i.inventory_id
+        LEFT JOIN
+    film_category fc ON i.film_id = fc.film_id
+        LEFT JOIN
+    category c ON fc.category_id = c.category_id; -- correct 
